@@ -21,8 +21,6 @@ ComfyUI 上では次の 2 ノードとして表示されます。
 - **Anima for Replay**: 安定運用向けの Replay 専用ノードです。Spectrum を使わず、元の Replay 系の挙動だけを使いたい場合に向いています。
 - **Anima for Spectrum**: Spectrum を使うメインノードです。通常はこのノードを使い、細かい調整が必要なときだけ Advanced 項目を開く想定です。
 
-![Node Screenshot](node-screenshot.webp)
-
 ## インストール
 
 `ComfyUI/custom_nodes` で次を実行してください。
