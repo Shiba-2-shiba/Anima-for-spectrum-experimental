@@ -2,7 +2,7 @@
 
 Project: Anima-for-spectrum
 Repository: https://github.com/Shiba-2-shiba/Anima-for-spectrum
-Status: planning artifacts added; implementation not started
+Status: P1 static behavior lock started; P2 topology discovery foundation added
 Last updated: 2026-06-02
 
 ## Current Status
@@ -108,10 +108,45 @@ Next:
 
 P1 として既存 public node metadata / no-op behavior のテストを追加し、その後 read-only topology discovery を始める。
 
+### 2026-06-02 - ComfyUI-free regression tests and metrics added
+
+Changed:
+
+- Added pytest coverage for public node IDs, legacy node exports, input order, and defaults.
+- Added pytest coverage for replay block-index parsing and schedule helpers.
+- Added pytest coverage for residual calibration modes.
+- Fixed root entrypoint fallback imports so pytest and local non-package imports can load the legacy node surface without ComfyUI.
+- Added `core/forecast_metrics.py` for shadow forecast error metrics.
+
+Verification:
+
+- `python -m pytest -q` -> 24 passed.
+
+Next:
+
+Add topology discovery and feature-site diagnostics without changing generation output.
+
+### 2026-06-02 - Read-only topology discovery foundation added
+
+Changed:
+
+- Added `core/topology.py`.
+- Added `TopologyReport` and `ModuleListCandidate` records.
+- Added read-only discovery for model identity, candidate transformer object, repeated block containers, known Anima methods, block class names, and forward signatures.
+- Added fake-model tests for direct models, nested transformer models, JSON-ready reports, and models without block containers.
+
+Verification:
+
+- `python -m pytest -q` -> 29 passed.
+
+Next:
+
+Wire topology report emission into an observe-only diagnostics path, then add feature-site abstractions.
+
 ## Current Phase
 
 ```text
-P0 - Planning and scope lock
+P1/P2/P4 - Behavior lock, topology discovery, and metric foundation available
 ```
 
 P1-P4 が終わるまで feature replacement 実装へ進まない。

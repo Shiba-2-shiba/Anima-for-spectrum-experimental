@@ -15,25 +15,25 @@ Task plan: topology-aware Spectrum refactor
 
 ## P1 - Behavior Lock Before Refactor
 
-- [ ] P1-T01 public node ID の static test を追加する。
+- [x] P1-T01 public node ID の static test を追加する。
 - [ ] P1-T02 V3 schema の input 名と default 値の static test を追加する。
-- [ ] P1-T03 legacy replacement mapping の static test を追加する。
-- [ ] P1-T04 `build_compat_input_types()` の test を追加する。
-- [ ] P1-T05 `build_phase2_input_types()` の test を追加する。
+- [x] P1-T03 legacy replacement mapping の static test を追加する。
+- [x] P1-T04 `build_compat_input_types()` の test を追加する。
+- [x] P1-T05 `build_phase2_input_types()` の test を追加する。
 - [ ] P1-T06 fake model で Replay disabled path の no-op test を追加する。
 - [ ] P1-T07 fake model で Spectrum disabled path の no-op test を追加する。
 - [ ] P1-T08 actual-only mode 実装後、fake model actual-only test を追加する。
 
 ## P2 - Topology Discovery
 
-- [ ] P2-T01 `core/topology.py` を追加する。
-- [ ] P2-T02 diffusion model class / module を記録する。
-- [ ] P2-T03 candidate transformer object を探索する。
-- [ ] P2-T04 repeated block container の name / length を探索する。
-- [ ] P2-T05 block class name と forward signature を記録する。
-- [ ] P2-T06 Anima 既知 method を検出する: `forward_before_blocks`, `decoder_head`, block runner shape。
+- [x] P2-T01 `core/topology.py` を追加する。
+- [x] P2-T02 diffusion model class / module を記録する。
+- [x] P2-T03 candidate transformer object を探索する。
+- [x] P2-T04 repeated block container の name / length を探索する。
+- [x] P2-T05 block class name と forward signature を記録する。
+- [x] P2-T06 Anima 既知 method を検出する: `forward_before_blocks`, `decoder_head`, block runner shape。
 - [ ] P2-T07 `anima_spectrum_topology` JSONL record を出す。
-- [ ] P2-T08 topology report serialization の unit test を追加する。
+- [x] P2-T08 topology report serialization の unit test を追加する。
 - [ ] P2-T09 real Anima workflow で topology discovery を実行する。
 
 ## P3 - Feature Site Abstraction
@@ -49,8 +49,8 @@ Task plan: topology-aware Spectrum refactor
 
 ## P4 - Shadow Forecast Foundation
 
-- [ ] P4-T01 `core/forecast_metrics.py` を追加する。
-- [ ] P4-T02 MSE, relative L2, cosine, norm ratio, clamp fraction の metric 関数を追加する。
+- [x] P4-T01 `core/forecast_metrics.py` を追加する。
+- [x] P4-T02 MSE, relative L2, cosine, norm ratio, clamp fraction の metric 関数を追加する。
 - [ ] P4-T03 `core/forecast_records.py` を追加する。
 - [ ] P4-T04 `core/forecast_shadow.py` を追加する。
 - [ ] P4-T05 内部的に `forecast_mode=off|actual_only|shadow|replace` を追加する。
