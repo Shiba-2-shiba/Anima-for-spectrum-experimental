@@ -1,49 +1,32 @@
 {
-  "id": "anima-spectrum-debug-minimal",
+  "id": "image-anima-base-v1-spectrum-debug",
   "revision": 0,
-  "last_node_id": 10,
-  "last_link_id": 10,
+  "last_node_id": 79,
+  "last_link_id": 114,
   "nodes": [
     {
-      "id": 1,
-      "type": "UNETLoader",
-      "pos": [-960, -160],
-      "size": [310, 130],
+      "id": 71,
+      "type": "CLIPLoader",
+      "pos": [
+        -960,
+        20
+      ],
+      "size": [
+        310,
+        150
+      ],
       "flags": {},
       "order": 0,
       "mode": 0,
       "inputs": [],
       "outputs": [
         {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [1]
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "UNETLoader",
-        "cnr_id": "comfy-core",
-        "ver": "0.11.0"
-      },
-      "widgets_values": [
-        "hotaruBlendAnima_v40.safetensors",
-        "default"
-      ]
-    },
-    {
-      "id": 2,
-      "type": "CLIPLoader",
-      "pos": [-960, 20],
-      "size": [310, 150],
-      "flags": {},
-      "order": 1,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
           "name": "CLIP",
           "type": "CLIP",
-          "links": [2, 3]
+          "links": [
+            107,
+            112
+          ]
         }
       ],
       "properties": {
@@ -58,19 +41,27 @@
       ]
     },
     {
-      "id": 3,
+      "id": 72,
       "type": "VAELoader",
-      "pos": [-960, 230],
-      "size": [310, 100],
+      "pos": [
+        -960,
+        230
+      ],
+      "size": [
+        310,
+        100
+      ],
       "flags": {},
-      "order": 2,
+      "order": 1,
       "mode": 0,
       "inputs": [],
       "outputs": [
         {
           "name": "VAE",
           "type": "VAE",
-          "links": [4]
+          "links": [
+            106
+          ]
         }
       ],
       "properties": {
@@ -83,10 +74,50 @@
       ]
     },
     {
-      "id": 4,
+      "id": 78,
+      "type": "UNETLoader",
+      "pos": [
+        -960,
+        -160
+      ],
+      "size": [
+        310,
+        130
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            108
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "UNETLoader",
+        "cnr_id": "comfy-core",
+        "ver": "0.11.0"
+      },
+      "widgets_values": [
+        "anima-base-v1.0.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 75,
       "type": "CLIPTextEncode",
-      "pos": [-600, -120],
-      "size": [460, 190],
+      "pos": [
+        -600,
+        120
+      ],
+      "size": [
+        460,
+        150
+      ],
       "flags": {},
       "order": 3,
       "mode": 0,
@@ -94,48 +125,16 @@
         {
           "name": "clip",
           "type": "CLIP",
-          "link": 2
+          "link": 107
         }
       ],
       "outputs": [
         {
           "name": "CONDITIONING",
           "type": "CONDITIONING",
-          "links": [5]
-        }
-      ],
-      "title": "CLIP Text Encode (Positive Prompt)",
-      "properties": {
-        "Node name for S&R": "CLIPTextEncode",
-        "cnr_id": "comfy-core",
-        "ver": "0.3.65"
-      },
-      "widgets_values": [
-        "masterpiece, best quality, score_7, safe, anime, a close-up of a futuristic cyberpunk robotic eye, chrome plating, exposed wiring, glowing orange indicator lights, detailed iris, sharp line art, high contrast cyberpunk color palette"
-      ],
-      "color": "#232",
-      "bgcolor": "#353"
-    },
-    {
-      "id": 5,
-      "type": "CLIPTextEncode",
-      "pos": [-600, 120],
-      "size": [460, 150],
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "clip",
-          "type": "CLIP",
-          "link": 3
-        }
-      ],
-      "outputs": [
-        {
-          "name": "CONDITIONING",
-          "type": "CONDITIONING",
-          "links": [6]
+          "links": [
+            110
+          ]
         }
       ],
       "title": "CLIP Text Encode (Negative Prompt)",
@@ -151,10 +150,58 @@
       "bgcolor": "#335"
     },
     {
-      "id": 6,
+      "id": 77,
+      "type": "CLIPTextEncode",
+      "pos": [
+        -600,
+        -120
+      ],
+      "size": [
+        460,
+        190
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 112
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            109
+          ]
+        }
+      ],
+      "title": "CLIP Text Encode (Positive Prompt)",
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode",
+        "cnr_id": "comfy-core",
+        "ver": "0.3.65"
+      },
+      "widgets_values": [
+        "Anime monochrome cyberpunk front portrait, male figure, sleek skin with delicate mechanical lines, piercing glowing eyes, partial exposed metallic mecha components and light cables, sharp domineering cool style, textured anime brushwork, faint circuit background, high contrast chiaroscuro lighting, immersive cinematic shadows, ultra fine details, 8K high-def render, futuristic dystopian mood"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 74,
       "type": "EmptyLatentImage",
-      "pos": [-600, 340],
-      "size": [310, 150],
+      "pos": [
+        -600,
+        340
+      ],
+      "size": [
+        310,
+        150
+      ],
       "flags": {},
       "order": 5,
       "mode": 0,
@@ -163,7 +210,9 @@
         {
           "name": "LATENT",
           "type": "LATENT",
-          "links": [7]
+          "links": [
+            111
+          ]
         }
       ],
       "properties": {
@@ -178,10 +227,16 @@
       ]
     },
     {
-      "id": 8,
+      "id": 79,
       "type": "ShibaAnimaForSpectrumExperimental",
-      "pos": [-110, -180],
-      "size": [360, 520],
+      "pos": [
+        -110,
+        -180
+      ],
+      "size": [
+        360,
+        520
+      ],
       "flags": {},
       "order": 6,
       "mode": 0,
@@ -189,14 +244,16 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 1
+          "link": 108
         }
       ],
       "outputs": [
         {
           "name": "patched_model",
           "type": "MODEL",
-          "links": [8]
+          "links": [
+            114
+          ]
         }
       ],
       "title": "Anima for Spectrum - debug logging",
@@ -229,10 +286,16 @@
       ]
     },
     {
-      "id": 7,
+      "id": 76,
       "type": "KSampler",
-      "pos": [320, -150],
-      "size": [305, 435],
+      "pos": [
+        320,
+        -150
+      ],
+      "size": [
+        305,
+        435
+      ],
       "flags": {},
       "order": 7,
       "mode": 0,
@@ -240,22 +303,22 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 8
+          "link": 114
         },
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 5
+          "link": 109
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 6
+          "link": 110
         },
         {
           "name": "latent_image",
           "type": "LATENT",
-          "link": 7
+          "link": 111
         }
       ],
       "outputs": [
@@ -263,7 +326,9 @@
           "name": "LATENT",
           "type": "LATENT",
           "slot_index": 0,
-          "links": [9]
+          "links": [
+            105
+          ]
         }
       ],
       "properties": {
@@ -272,7 +337,7 @@
         "ver": "0.3.40"
       },
       "widgets_values": [
-        875817230929295,
+        875817230929465,
         "fixed",
         30,
         4,
@@ -282,10 +347,16 @@
       ]
     },
     {
-      "id": 9,
+      "id": 73,
       "type": "VAEDecode",
-      "pos": [680, -120],
-      "size": [230, 90],
+      "pos": [
+        680,
+        -120
+      ],
+      "size": [
+        230,
+        90
+      ],
       "flags": {},
       "order": 8,
       "mode": 0,
@@ -293,12 +364,12 @@
         {
           "name": "samples",
           "type": "LATENT",
-          "link": 9
+          "link": 105
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": 4
+          "link": 106
         }
       ],
       "outputs": [
@@ -306,7 +377,9 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "slot_index": 0,
-          "links": [10]
+          "links": [
+            113
+          ]
         }
       ],
       "properties": {
@@ -317,10 +390,16 @@
       "widgets_values": []
     },
     {
-      "id": 10,
+      "id": 46,
       "type": "SaveImage",
-      "pos": [960, -150],
-      "size": [520, 380],
+      "pos": [
+        960,
+        -150
+      ],
+      "size": [
+        520,
+        380
+      ],
       "flags": {},
       "order": 9,
       "mode": 0,
@@ -328,7 +407,7 @@
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 10
+          "link": 113
         }
       ],
       "outputs": [],
@@ -343,16 +422,86 @@
     }
   ],
   "links": [
-    [1, 1, 0, 8, 0, "MODEL"],
-    [2, 2, 0, 4, 0, "CLIP"],
-    [3, 2, 0, 5, 0, "CLIP"],
-    [4, 3, 0, 9, 1, "VAE"],
-    [5, 4, 0, 7, 1, "CONDITIONING"],
-    [6, 5, 0, 7, 2, "CONDITIONING"],
-    [7, 6, 0, 7, 3, "LATENT"],
-    [8, 8, 0, 7, 0, "MODEL"],
-    [9, 7, 0, 9, 0, "LATENT"],
-    [10, 9, 0, 10, 0, "IMAGE"]
+    [
+      105,
+      76,
+      0,
+      73,
+      0,
+      "LATENT"
+    ],
+    [
+      106,
+      72,
+      0,
+      73,
+      1,
+      "VAE"
+    ],
+    [
+      107,
+      71,
+      0,
+      75,
+      0,
+      "CLIP"
+    ],
+    [
+      108,
+      78,
+      0,
+      79,
+      0,
+      "MODEL"
+    ],
+    [
+      109,
+      77,
+      0,
+      76,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      110,
+      75,
+      0,
+      76,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      111,
+      74,
+      0,
+      76,
+      3,
+      "LATENT"
+    ],
+    [
+      112,
+      71,
+      0,
+      77,
+      0,
+      "CLIP"
+    ],
+    [
+      113,
+      73,
+      0,
+      46,
+      0,
+      "IMAGE"
+    ],
+    [
+      114,
+      79,
+      0,
+      76,
+      0,
+      "MODEL"
+    ]
   ],
   "groups": [],
   "definitions": {
@@ -362,7 +511,10 @@
   "extra": {
     "ds": {
       "scale": 0.75,
-      "offset": [900, 420]
+      "offset": [
+        900,
+        420
+      ]
     },
     "frontendVersion": "1.45.14",
     "workflowRendererVersion": "Vue-corrected",
@@ -370,7 +522,7 @@
     "VHS_latentpreviewrate": 0,
     "VHS_MetadataImage": true,
     "VHS_KeepIntermediate": true,
-    "anima_spectrum_debug_note": "Minimal workflow for Anima for Spectrum debug_logging=true. Logs are written by the custom node under docs/context_refactor/logs in the custom node directory."
+    "anima_spectrum_debug_note": "Derived from image_anima_base_v1.json. Inserts ShibaAnimaForSpectrumExperimental between UNETLoader and KSampler, with debug_logging=true."
   },
   "version": 0.4
 }

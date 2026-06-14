@@ -1,0 +1,132 @@
+{
+  "71": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_3_06b_base.safetensors",
+      "type": "stable_diffusion",
+      "device": "default"
+    }
+  },
+  "72": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "qwen_image_vae.safetensors"
+    }
+  },
+  "73": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "76",
+        0
+      ],
+      "vae": [
+        "72",
+        0
+      ]
+    }
+  },
+  "74": {
+    "class_type": "EmptyLatentImage",
+    "inputs": {
+      "width": 1024,
+      "height": 1024,
+      "batch_size": 1
+    }
+  },
+  "75": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "worst quality, low quality, score_1, score_2, score_3, blurry, jpeg artifacts, sepia",
+      "clip": [
+        "71",
+        0
+      ]
+    }
+  },
+  "76": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 875817230929465,
+      "steps": 30,
+      "cfg": 4.0,
+      "sampler_name": "er_sde",
+      "scheduler": "simple",
+      "denoise": 1.0,
+      "model": [
+        "79",
+        0
+      ],
+      "positive": [
+        "77",
+        0
+      ],
+      "negative": [
+        "75",
+        0
+      ],
+      "latent_image": [
+        "74",
+        0
+      ]
+    }
+  },
+  "77": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Anime monochrome cyberpunk front portrait, male figure, sleek skin with delicate mechanical lines, piercing glowing eyes, partial exposed metallic mecha components and light cables, sharp domineering cool style, textured anime brushwork, faint circuit background, high contrast chiaroscuro lighting, immersive cinematic shadows, ultra fine details, 8K high-def render, futuristic dystopian mood",
+      "clip": [
+        "71",
+        0
+      ]
+    }
+  },
+  "78": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "anima-base-v1.0.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "79": {
+    "class_type": "ShibaAnimaForSpectrumExperimental",
+    "inputs": {
+      "model": [
+        "78",
+        0
+      ],
+      "spectrum_preset": "W18Stop0",
+      "spectrum_w": 0.05,
+      "spectrum_warmup_steps": 18,
+      "spectrum_window_size": 2,
+      "enable_calibration": false,
+      "calibration_strength": 0.35,
+      "calibration_mode": "ema",
+      "spectrum_m": 16,
+      "spectrum_lam": 0.5,
+      "spectrum_taylor_damping": 1.0,
+      "spectrum_multistep_damping": 1.0,
+      "spectrum_flex_window": 0.0,
+      "spectrum_stop_caching_step": 0,
+      "spectrum_extra_forecast_steps": "",
+      "calibration_decay": 0.9,
+      "calibration_buckets": 4,
+      "calibration_min_obs": 2,
+      "debug_enable_spectrum": true,
+      "feature_site": "pre_decoder_head",
+      "target_block_index": 13,
+      "forecast_mode": "replace",
+      "debug_logging": true
+    }
+  },
+  "46": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "AnimaSpectrumDebug",
+      "images": [
+        "73",
+        0
+      ]
+    }
+  }
+}

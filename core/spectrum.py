@@ -17,12 +17,21 @@ def _should_use_rocm_pinv(tensor: torch.Tensor) -> bool:
 
 
 class CalibratedChebyshevForecaster:
-    def __init__(self, m: int = 8, lam: float = 0.5):
+    def __init__(
+        self,
+        m: int = 8,
+        lam: float = 0.5,
+        taylor_damping: float = 1.0,
+        multistep_damping: float = 1.0,
+    ):
         self.M = m
         self.K = max(m + 2, 8)
         self.lam = lam
+        self.taylor_damping = max(0.0, min(1.0, float(taylor_damping)))
+        self.multistep_damping = max(0.0, min(1.0, float(multistep_damping)))
         self.H_buf: List[torch.Tensor] = []
         self.T_buf: List[float] = []
+        self.Cnt_buf: List[float] = []
         self.shape = None
         self.dtype = None
         self.t_max = 49.0
@@ -76,11 +85,29 @@ class CalibratedChebyshevForecaster:
 
         self.H_buf.append(h.detach().reshape(-1))
         self.T_buf.append(self._taus(cnt))
+        self.Cnt_buf.append(float(cnt))
         if len(self.H_buf) > self.K:
             self.H_buf.pop(0)
             self.T_buf.pop(0)
+            self.Cnt_buf.pop(0)
 
-    def compute_raw_guess(self, cnt: int, w: float) -> torch.Tensor:
+    def _compute_taylor_guess(self, cnt: int, *, forecast_horizon: int = 1) -> torch.Tensor:
+        if len(self.H_buf) < 2:
+            return self.H_buf[-1].to(torch.float32)
+
+        h_i = self.H_buf[-1].to(torch.float32)
+        h_im1 = self.H_buf[-2].to(torch.float32)
+        step_i = self.Cnt_buf[-1]
+        step_im1 = self.Cnt_buf[-2]
+        step_delta = max(step_i - step_im1, 1e-8)
+        target_delta = float(cnt) - step_i
+        raw_scale = target_delta / step_delta
+        if int(forecast_horizon) > 1:
+            raw_scale *= self.multistep_damping
+        scale = raw_scale * self.taylor_damping
+        return h_i + scale * (h_i - h_im1)
+
+    def compute_raw_guess(self, cnt: int, w: float, *, forecast_horizon: int = 1) -> torch.Tensor:
         if not self.H_buf:
             raise RuntimeError("Cannot compute a raw forecast without any cached history.")
 
@@ -95,12 +122,7 @@ class CalibratedChebyshevForecaster:
         x_star = self._build_design(tau_star)
         pred_cheb = (x_star @ coef).squeeze(0)
 
-        if len(self.H_buf) >= 2:
-            h_i = self.H_buf[-1].to(torch.float32)
-            h_im1 = self.H_buf[-2].to(torch.float32)
-            h_taylor = h_i + 0.5 * (h_i - h_im1)
-        else:
-            h_taylor = self.H_buf[-1].to(torch.float32)
+        h_taylor = self._compute_taylor_guess(cnt, forecast_horizon=forecast_horizon)
 
         return ((1.0 - w) * h_taylor + w * pred_cheb).view(self.shape)
 
@@ -151,13 +173,14 @@ class CalibratedChebyshevForecaster:
         enable_calibration: bool = False,
         calibration_strength: float = 0.5,
         *,
+        forecast_horizon: int = 1,
         progress: float = 0.0,
         calibration_mode: str = CALIBRATION_MODE_LATEST,
         calibration_decay: float = 0.9,
         calibration_buckets: int = 4,
         calibration_min_obs: int = 1,
     ) -> torch.Tensor:
-        raw_guess = self.compute_raw_guess(cnt, w=w)
+        raw_guess = self.compute_raw_guess(cnt, w=w, forecast_horizon=forecast_horizon)
         apply_result = self.apply_calibration(
             raw_guess,
             enabled=enable_calibration,
@@ -173,6 +196,7 @@ class CalibratedChebyshevForecaster:
     def reset_buffers(self) -> None:
         self.H_buf.clear()
         self.T_buf.clear()
+        self.Cnt_buf.clear()
         self.shape = None
         self.dtype = None
         self.calibration.reset()
@@ -190,6 +214,8 @@ class SpectrumConfig:
     stop_caching_step: int
     enable_calibration: bool
     calibration_strength: float
+    taylor_damping: float = 1.0
+    multistep_damping: float = 1.0
     calibration_mode: str = CALIBRATION_MODE_LATEST
     calibration_decay: float = 0.9
     calibration_buckets: int = 4
@@ -209,6 +235,8 @@ class SpectrumController:
             stop_caching_step=int(config.stop_caching_step),
             enable_calibration=bool(config.enable_calibration),
             calibration_strength=max(0.0, min(1.0, float(config.calibration_strength))),
+            taylor_damping=max(0.0, min(1.0, float(getattr(config, "taylor_damping", 1.0)))),
+            multistep_damping=max(0.0, min(1.0, float(getattr(config, "multistep_damping", 1.0)))),
             calibration_mode=str(getattr(config, "calibration_mode", CALIBRATION_MODE_LATEST)),
             calibration_decay=max(0.0, min(0.999, float(getattr(config, "calibration_decay", 0.9)))),
             calibration_buckets=max(1, int(getattr(config, "calibration_buckets", 4))),
@@ -229,7 +257,12 @@ class SpectrumController:
 
     def _build_forecasters(self, batch_size: int) -> List[CalibratedChebyshevForecaster]:
         forecasters = [
-            CalibratedChebyshevForecaster(m=self.config.m, lam=self.config.lam)
+            CalibratedChebyshevForecaster(
+                m=self.config.m,
+                lam=self.config.lam,
+                taylor_damping=self.config.taylor_damping,
+                multistep_damping=self.config.multistep_damping,
+            )
             for _ in range(batch_size)
         ]
         for forecaster in forecasters:
@@ -271,6 +304,10 @@ class SpectrumController:
 
     def _current_progress(self) -> float:
         return max(0.0, min(1.0, float(self.cnt) / max(float(self.estimated_last_step_index), 1.0)))
+
+    def _advance_window_after_actual(self) -> None:
+        if self.cnt >= self.config.warmup_steps:
+            self.curr_ws += self.config.flex_window
 
     def run(self, kwargs: dict, compute_actual: Callable[[dict], torch.Tensor]):
         if not self.config.enabled:
@@ -316,6 +353,7 @@ class SpectrumController:
             actual_kwargs = slice_model_kwargs(kwargs, actual_indices, batch_size)
             actual_out = compute_actual(actual_kwargs)
             out[actual_mask] = actual_out
+            self._advance_window_after_actual()
 
             for local_index, batch_index in enumerate(actual_indices.tolist()):
                 forecaster = self.forecasters[batch_index]
@@ -346,6 +384,7 @@ class SpectrumController:
                     w=self.config.w,
                     enable_calibration=self.config.enable_calibration,
                     calibration_strength=self.config.calibration_strength,
+                    forecast_horizon=self.num_cached[batch_index] + 1,
                     progress=progress,
                     calibration_mode=self.config.calibration_mode,
                     calibration_decay=self.config.calibration_decay,
@@ -354,9 +393,6 @@ class SpectrumController:
                 ).to(x.dtype)
                 self.num_cached[batch_index] += 1
             out[forecast_mask] = forecast_out
-
-        if self.cnt >= self.config.warmup_steps:
-            self.curr_ws += self.config.flex_window
 
         self.cnt += 1
         return out

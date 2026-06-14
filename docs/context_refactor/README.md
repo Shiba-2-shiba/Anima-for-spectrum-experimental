@@ -35,15 +35,44 @@ Implemented so far:
 - Phase 2 now supports `latest`, `ema`, and `bucketed_ema` calibration modes
 - Phase 2 can emit JSONL step logs under `docs/context_refactor/logs/`
 - `nodes/phase2.py` now exposes the current Spectrum runtime path with calibration mode controls
+- `forecast_mode=replace|shadow|actual_only` is available as an advanced debug control
+- `core/forecast_records.py` now emits stable record types while preserving legacy log keys
+- `core/feature_sites.py` names the current Phase 2 site as `pre_decoder_head`
+- `feature_site=post_block` is available for selected block shadow diagnostics after runtime restart
+- `docs/context_refactor/feature-site-shadow-comparison-2026-06-13.md` records the first `pre_decoder_head` vs `post_block` API comparison
+- `docs/context_refactor/calibration-shadow-comparison-2026-06-13.md` records the first calibration mode API comparison
+- `docs/context_refactor/forecast-hyperparameter-shadow-replace-2026-06-13.md` records the first conservative replace checks
 
 Current measured state:
 
 - the Phase 2 node still expects a clean `MODEL` input and does not stack with another `model_function_wrapper` patch yet
-- `enable_spectrum=false` matches baseline nearly perfectly on Anima
+- on the 2026-06-13 live ComfyUI API run, baseline, Spectrum no-op, and `forecast_mode=shadow` produced pixel-identical PNG outputs
+- the current Phase 2 site can now log forecast-vs-actual metrics without changing generated pixels
 - `enable_spectrum=true` with `warmup_steps=6` runs at Phase 1-like speed but quality collapses
 - `enable_spectrum=true` with `warmup_steps=20` returns to near-perfect baseline quality
 
-This still means the intermediate-feature path reconstruction itself is correct enough for no-op and all-actual execution, while the current forecast path remains the main failure point.
+This still means the intermediate-feature path reconstruction itself is correct enough for no-op, all-actual, and shadow execution, while replace-mode forecast quality remains the main failure point.
+
+## 2026-06-13 live API comparison
+
+Record:
+
+- `docs/context_refactor/base-workflow-comparison-2026-06-13.md`
+
+Confirmed:
+
+- ComfyUI 0.24.0 on `http://localhost:8000`
+- `image_anima_base_v1_spectrum_debug(api).json` preflight passed
+- `/object_info/ShibaAnimaForSpectrumExperimental` exposed `forecast_mode`
+- baseline, no-op, and shadow API runs completed
+- no-op vs baseline was a pixel-exact match
+- shadow vs baseline was a pixel-exact match
+- shadow log `phase2-20260613T071525.810041Z-run01.jsonl` contains 58 shadow step records
+
+Metric summary from the shadow run:
+
+- raw_vs_actual_rel_l2 average 0.0694, min 0.0340, max 0.2320
+- raw_vs_actual_cosine average 0.9970, min 0.9753, max 0.9995
 
 ## 2026-03-29 measurement snapshot
 
@@ -85,11 +114,23 @@ Fallback scoring prefers names like `blocks` or `layers`, repeated block-like mo
 These items define the current Phase 2 queue:
 
 - rerun the failing `warmup_steps=6` case with `debug_logging=true`
-- compare `no calibration`, `latest`, `ema`, and `bucketed_ema` without changing forecast hyperparameters at the same time
+- compare `no calibration`, `latest`, `ema`, and `bucketed_ema` in shadow mode without changing forecast hyperparameters at the same time
 - current practical default candidate on the 20-step workflow is `ema` with `calibration_strength=0.35` and `spectrum_w=0.10`
 - inspect `raw_vs_actual_*`, `calibrated_vs_actual_*`, `clip_frac_*`, and `correction_raw_ratio` in the JSONL logs
 - keep `enable_calibration=false` as the default until a logged case beats the no-cal baseline
-- extend debug coverage later with sampled shadow-actual runs if step logs alone are insufficient
+- extend debug coverage to additional feature-site candidates; current shadow coverage only measures the existing Phase 2 site
+- keep `pre_decoder_head` as the main candidate; tested `post_block` sites drifted more in shadow metrics
+- keep calibration default-off; tested enabled calibration modes did not beat no-calibration in shadow metrics
+- visual review judged warmup 18/20/22 close enough to prefer the fastest acceptable setting
+- default automatic late-step actual-only guard made W18 forecast only three steps, so it did not improve wall-clock timing
+- current measured quality/speed target is `pre_decoder_head`, calibration off, `spectrum_w=0.05`, `window_size=2`, warmup 18, `spectrum_stop_caching_step=0`
+- measured API wall-clock timing improved from baseline avg 38.84s to W18Stop0 avg 34.82s
+- after restart, four prompt/seed checks kept W18Stop0 around 34.85s avg versus baseline 39.86s avg; M04 showed the largest pixel drift and should remain in the visual regression set
+- later four-prompt comparison against Spectrum disabled measured Off `22.239s`, W18Stop0 `19.571s`, and W15F05MS000 `16.999s`
+- in that comparison W18Stop0 kept the better quality margin (avg PSNR `25.865`, MAE `5.509`) while W15F05MS000 traded quality for speed (avg PSNR `21.354`, MAE `10.808`)
+- treat W18Stop0 as the current quality-preserving candidate and W15F05MS000 as speed-first/aggressive only
+- extra step policy testing found W18Extra25MS025 as the least-damaging additional-skip candidate, but four-prompt validation showed no average speed gain over W18Stop0 and lower quality
+- keep `spectrum_extra_forecast_steps` as an experimental diagnostic control only; leave it empty for the current candidate
 - keep workflow metadata, seed, image path, and visual notes in the comparison record alongside the JSONL path
 
 ## Files
@@ -98,4 +139,17 @@ These items define the current Phase 2 queue:
 - `docs/context_refactor/base-workflow-comparison-checklist.md`
 - `docs/context_refactor/base-workflow-comparison-record-template.md`
 - `docs/context_refactor/base-workflow-comparison-2026-03-29.md`
+- `docs/context_refactor/base-workflow-comparison-2026-06-13.md`
+- `docs/context_refactor/base-workflow-comparison-2026-06-13-record-types.md`
+- `docs/context_refactor/feature-site-shadow-comparison-2026-06-13.md`
+- `docs/context_refactor/calibration-shadow-comparison-2026-06-13.md`
+- `docs/context_refactor/forecast-hyperparameter-shadow-replace-2026-06-13.md`
+- `docs/context_refactor/visual-review-2026-06-13.md`
+- `docs/context_refactor/visual-speed-selection-2026-06-13.md`
+- `docs/context_refactor/stop-guard-speed-comparison-2026-06-13.md`
+- `docs/context_refactor/multi-prompt-w18-stop0-validation-2026-06-13.md`
+- `docs/context_refactor/off-w18-w15-multi-prompt-2026-06-13.md`
+- `docs/context_refactor/flex-window-api-extra-2026-06-13.md`
+- `docs/context_refactor/flex-window-api-extradamping-2026-06-13.md`
+- `docs/context_refactor/off-w18-extra25-multi-prompt-2026-06-13.md`
 - `docs/context_refactor/logs/`

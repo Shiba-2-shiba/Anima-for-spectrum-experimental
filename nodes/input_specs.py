@@ -34,6 +34,15 @@ LEGACY_COMPAT_NODE_ID = "AnimaLayerReplayPatcher"
 LEGACY_PHASE2_NODE_ID = "AnimaIntermediateSpectrumPatcher"
 LEGACY_PUBLIC_COMPAT_NODE_ID = "ShibaAnimaForSpectrum"
 
+SPECTRUM_PRESET_W18_STOP0 = "W18Stop0"
+SPECTRUM_PRESET_W15_F05_MS000 = "W15F05MS000"
+SPECTRUM_PRESET_MANUAL = "Manual"
+SPECTRUM_PRESET_CHOICES = [
+    SPECTRUM_PRESET_W18_STOP0,
+    SPECTRUM_PRESET_W15_F05_MS000,
+    SPECTRUM_PRESET_MANUAL,
+]
+
 
 def build_compat_input_types() -> dict:
     return {
@@ -81,24 +90,34 @@ def build_compat_input_types() -> dict:
 def build_phase2_input_types() -> dict:
     required = {
         "model": ("MODEL",),
+        "spectrum_preset": (
+            SPECTRUM_PRESET_CHOICES,
+            {
+                "default": SPECTRUM_PRESET_W18_STOP0,
+                "tooltip": (
+                    "測定済みプリセットです。W18Stop0 は品質優先の第一候補、"
+                    "W15F05MS000 は速度優先の第二候補です。Manual は下の詳細値をそのまま使います。"
+                ),
+            },
+        ),
         "spectrum_w": (
             "FLOAT",
             {
-                "default": 0.10,
+                "default": 0.05,
                 "min": 0.0,
                 "max": 1.0,
                 "step": 0.01,
-                "tooltip": "画質と速度のバランスです。低いほど安全寄り、高いほど攻めた設定です。",
+                "tooltip": "画質と速度のバランスです。W18Stop0/W15F05MS000 は 0.05 を使います。",
             },
         ),
         "spectrum_warmup_steps": (
             "INT",
             {
-                "default": 6,
+                "default": 18,
                 "min": 0,
                 "max": 50,
                 "step": 1,
-                "tooltip": "予測を始める前に実測するステップ数です。",
+                "tooltip": "予測を始める前に実測するステップ数です。W18Stop0 は 18、W15F05MS000 は 15 です。",
             },
         ),
         "spectrum_window_size": (
@@ -156,6 +175,28 @@ def build_phase2_input_types() -> dict:
                 "tooltip": "係数フィッティング時の正則化の強さです。",
             },
         ),
+        "spectrum_taylor_damping": (
+            "FLOAT",
+            {
+                "default": 1.0,
+                "min": 0.0,
+                "max": 1.0,
+                "step": 0.05,
+                "advanced": True,
+                "tooltip": "Taylor 外挿の強さです。1.0 で現行動作、低いほど外挿を弱めます。",
+            },
+        ),
+        "spectrum_multistep_damping": (
+            "FLOAT",
+            {
+                "default": 1.0,
+                "min": 0.0,
+                "max": 1.0,
+                "step": 0.05,
+                "advanced": True,
+                "tooltip": "複数ステップ先を予測するときだけ Taylor 外挿の追加分を弱めます。1.0 で現行動作です。",
+            },
+        ),
         "spectrum_flex_window": (
             "FLOAT",
             {
@@ -164,18 +205,27 @@ def build_phase2_input_types() -> dict:
                 "max": 1.0,
                 "step": 0.01,
                 "advanced": True,
-                "tooltip": "Warmup 後に予測ウィンドウを追加で広げる量です。",
+                "tooltip": "Warmup 後に予測ウィンドウを追加で広げる量です。W15F05MS000 は 0.5 です。",
             },
         ),
         "spectrum_stop_caching_step": (
             "INT",
             {
-                "default": -1,
+                "default": 0,
                 "min": -1,
                 "max": 200,
                 "step": 1,
                 "advanced": True,
-                "tooltip": "予測を止める最終ステップです。-1 で自動停止になります。",
+                "tooltip": "予測を止める最終ステップです。W18Stop0/W15F05MS000 は 0 で終盤停止なしです。-1 で終盤を自動停止します。",
+            },
+        ),
+        "spectrum_extra_forecast_steps": (
+            "STRING",
+            {
+                "default": "",
+                "multiline": False,
+                "advanced": True,
+                "tooltip": "追加で予測に回す0-basedステップ番号です。例: 23 または 21,25。空なら通常スケジュールです。",
             },
         ),
         "calibration_decay": (
@@ -217,6 +267,33 @@ def build_phase2_input_types() -> dict:
                 "default": True,
                 "advanced": True,
                 "tooltip": "内部デバッグ用の互換スイッチです。調査時以外はオンのままにしてください。",
+            },
+        ),
+        "feature_site": (
+            ["pre_decoder_head", "post_block"],
+            {
+                "default": "pre_decoder_head",
+                "advanced": True,
+                "tooltip": "shadow 比較で測定する特徴位置です。post_block は target_block_index を使います。",
+            },
+        ),
+        "target_block_index": (
+            "INT",
+            {
+                "default": 13,
+                "min": 0,
+                "max": 200,
+                "step": 1,
+                "advanced": True,
+                "tooltip": "feature_site=post_block のときに測定する block index です。",
+            },
+        ),
+        "forecast_mode": (
+            ["replace", "shadow", "actual_only"],
+            {
+                "default": "replace",
+                "advanced": True,
+                "tooltip": "replace は予測を生成へ反映し、shadow は生成を変えずに予測誤差だけ記録します。",
             },
         ),
         "debug_logging": (
