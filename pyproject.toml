@@ -1,16 +1,16 @@
 [project]
-name = "comfyui-anima-for-spectrum"
-description = "Anima-for-spectrum nodes for ComfyUI"
+name = "comfyui-anima-for-spectrum-experimental"
+description = "Experimental Anima-for-spectrum nodes for ComfyUI"
 version = "0.1.0"
 license = { file = "LICENSE" }
 
 [project.urls]
-Repository = "https://github.com/Shiba-2-shiba/Anima-for-spectrum"
-Documentation = "https://github.com/Shiba-2-shiba/Anima-for-spectrum"
-"Bug Tracker" = "https://github.com/Shiba-2-shiba/Anima-for-spectrum/issues"
+Repository = "https://github.com/Shiba-2-shiba/Anima-for-spectrum-experimental"
+Documentation = "https://github.com/Shiba-2-shiba/Anima-for-spectrum-experimental"
+"Bug Tracker" = "https://github.com/Shiba-2-shiba/Anima-for-spectrum-experimental/issues"
 
 [tool.comfy]
 PublisherId = "shiba-2-shiba"
-DisplayName = "Anima-for-spectrum"
+DisplayName = "Anima-for-spectrum-experimental"
 Icon = ""
 includes = []
