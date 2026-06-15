@@ -98,8 +98,15 @@ def test_phase2_input_order_defaults_and_advanced_flags_are_stable():
     assert required["forecast_mode"][0] == ["replace", "shadow", "actual_only"]
     assert required["forecast_mode"][1]["default"] == "replace"
     assert required["debug_logging"][1]["default"] is False
+    assert required["spectrum_preset"][1].get("advanced") is None
 
     advanced_fields = [
+        "spectrum_w",
+        "spectrum_warmup_steps",
+        "spectrum_window_size",
+        "enable_calibration",
+        "calibration_strength",
+        "calibration_mode",
         "spectrum_m",
         "spectrum_lam",
         "spectrum_taylor_damping",
