@@ -10,8 +10,6 @@ Anima 系モデル向けの ComfyUI カスタムノードです。
 >
 > このリポジトリは `comfyui-spectrum-sdxl` より高速であることを主張するものではありません。対象モデルと実装箇所が異なるため、単純な速度比較はできません。
 
-![Node screenshot](./node-screenshot.webp)
-
 ## Nodes
 
 ComfyUI 上では次の 2 ノードとして表示されます。
