@@ -63,6 +63,14 @@ Advanced 項目:
 - `debug_enable_spectrum`
 - `debug_logging`
 
+#### Spectrum UI examples
+
+Preset 使用時は詳細パラメータが隠れ、Manual に切り替えたときだけ調整項目を表示します。
+
+| W18Stop0 | W15F05MS000 | Manual |
+| :--: | :--: | :--: |
+| <img src="./docs/asset/1.png" alt="W18Stop0 preset UI" width="260"> | <img src="./docs/asset/2.png" alt="W15F05MS000 preset UI" width="260"> | <img src="./docs/asset/3.png" alt="Manual preset UI" width="260"> |
+
 ## Installation
 
 `ComfyUI/custom_nodes` で次を実行してください。
@@ -72,6 +80,10 @@ git clone https://github.com/Shiba-2-shiba/Anima-for-spectrum-experimental.git
 ```
 
 その後、ComfyUI を再起動してください。
+
+## Example Workflow
+
+[Example-workflow.json](./Example-workflow.json) は、Anima for Spectrum を使う ComfyUI ワークフロー例です。ComfyUI に読み込んで、モデルファイル名や保存先を自分の環境に合わせて調整してください。
 
 ## Recommended Settings
 
