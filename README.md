@@ -10,6 +10,14 @@ Anima 系モデル向けの ComfyUI カスタムノードです。
 >
 > このリポジトリは `comfyui-spectrum-sdxl` より高速であることを主張するものではありません。対象モデルと実装箇所が異なるため、単純な速度比較はできません。
 
+## このリポジトリの立ち位置
+
+このリポジトリは、公式 [`Spectrum`](https://github.com/hanjq17/Spectrum) コードの直移植ではありません。論文で提案されている **feature forecasting** の考え方を、Anima / Predict2 系モデルの中間特徴に合わせて再実装・検証する実験リポジトリです。
+
+参考にした [`ruwwww/comfyui-spectrum-sdxl`](https://github.com/ruwwww/comfyui-spectrum-sdxl) は、公式 Spectrum の forecaster 構成に近い ComfyUI 向け実装です。一方、このリポジトリでは SDXL 汎用の raw output 予測ではなく、Anima 内部の `pre_decoder_head` などの中間特徴を予測対象にしています。
+
+そのため、このリポジトリの主目的は最大速度を狙うことではなく、Anima 向けに出力変化を小さく抑えた実用候補を探すことです。現在のメイン候補は `W18Stop0` です。
+
 ## Nodes
 
 ComfyUI 上では次の 2 ノードとして表示されます。
@@ -34,6 +42,14 @@ Spectrum 由来の考え方で中間特徴を予測し、一部の full evaluati
 
 通常利用では **Spectrum Preset** だけを選びます。Preset 使用時は下の詳細パラメータが内部で固定されるため、手動調整用の入力は Advanced に隠しています。
 Nodes 2.0 をオフにした旧UIでも、Preset が `Manual` 以外のときは同じ詳細パラメータを非表示にします。
+
+#### Spectrum UI examples
+
+Preset 使用時は詳細パラメータが隠れ、Manual に切り替えたときだけ調整項目を表示します。
+
+| W18Stop0 | W15F05MS000 | Manual |
+| :--: | :--: | :--: |
+| <img src="./docs/asset/1.png" alt="W18Stop0 preset UI" width="260"> | <img src="./docs/asset/2.png" alt="W15F05MS000 preset UI" width="260"> | <img src="./docs/asset/3.png" alt="Manual preset UI" width="260"> |
 
 通常表示:
 
@@ -62,14 +78,6 @@ Advanced 項目:
 - `calibration_min_obs`
 - `debug_enable_spectrum`
 - `debug_logging`
-
-#### Spectrum UI examples
-
-Preset 使用時は詳細パラメータが隠れ、Manual に切り替えたときだけ調整項目を表示します。
-
-| W18Stop0 | W15F05MS000 | Manual |
-| :--: | :--: | :--: |
-| <img src="./docs/asset/1.png" alt="W18Stop0 preset UI" width="260"> | <img src="./docs/asset/2.png" alt="W15F05MS000 preset UI" width="260"> | <img src="./docs/asset/3.png" alt="Manual preset UI" width="260"> |
 
 ## Installation
 
