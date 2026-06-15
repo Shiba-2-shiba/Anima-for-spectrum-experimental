@@ -1,10 +1,12 @@
+WEB_DIRECTORY = "./web"
+
 try:
     try:
         from .v3_nodes import comfy_entrypoint
     except ImportError:
         from v3_nodes import comfy_entrypoint
 
-    __all__ = ["comfy_entrypoint"]
+    __all__ = ["comfy_entrypoint", "WEB_DIRECTORY"]
 except ImportError:
     try:
         from .nodes import (
@@ -26,4 +28,5 @@ except ImportError:
         "AnimaIntermediateSpectrumPatcher",
         "NODE_CLASS_MAPPINGS",
         "NODE_DISPLAY_NAME_MAPPINGS",
+        "WEB_DIRECTORY",
     ]
